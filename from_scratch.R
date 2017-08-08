@@ -2,6 +2,9 @@ library(keras)
 
 # Parameters --------------------------------------------------------------
 
+model_exists <- TRUE
+model_name <- "model_filter323264_kernel3_epochs20_lr001.h5"
+
 batch_size <- 10
 epochs <- 20
 learning_rate <- 0.001
@@ -17,6 +20,7 @@ n_test <- 100
 
 train_data_dir = "data/train"
 test_data_dir = "data/test"
+preview_input_dir = "preview_input"
 
 
 # Defining the model ------------------------------------------------------
@@ -68,7 +72,8 @@ train_datagen <- image_data_generator(
     horizontal_flip = TRUE,
     vertical_flip = TRUE,
     shear_range = 0.2,
-    zoom_range = 0.2
+    zoom_range = 0.2,
+    fill_mode = "wrap"
   )
   
 test_datagen <- image_data_generator(
@@ -84,13 +89,22 @@ img <- image_load(img_path, target_size = c(224,224))
 x <- image_to_array(img)
 dim(x) <- c(1, dim(x))
 
-#flow_images_from_data(x, generator = train_datagen, batch_size = 1, save_to_dir='preview', save_prefix = basename(img_path))
-
-
+model %>% fit_generator(
+  generator = flow_images_from_directory(
+    preview_input_dir,
+    generator = train_datagen,
+    target_size = c(224,224),
+    batch_size = 1,
+    save_prefix = "test",
+    save_to_dir = "preview"),
+  steps_per_epoch = 1, 
+  epochs = 10)
+  
+  
 # Training ----------------------------------------------------------------
 
-
-model %>% fit_generator(
+if (model_exists == FALSE) {
+  model %>% fit_generator(
     generator = flow_images_from_directory(
       train_data_dir,
       generator = train_datagen,
@@ -102,12 +116,15 @@ model %>% fit_generator(
       test_data_dir,
       generator = test_datagen,
       target_size = c(target_height, target_width)),
-      validation_steps = as.integer(n_test/batch_size),
+    validation_steps = as.integer(n_test/batch_size),
     verbose = 1
   )
- 
+  model %>% save_model_hdf5(model_name)
+} else {
+  model <- load_model_hdf5(model_name)
+}
 
-model %>% save_model_hdf5("model_filter323264_kernel3_epochs20_lr001.h5")
+model %>% summary()
 
 # Test ----------------------------------------------------------------
  

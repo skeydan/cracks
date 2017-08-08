@@ -1,9 +1,13 @@
 library(keras)
 
 # Parameters --------------------------------------------------------------
+model_exists <- TRUE
+model_name <- "model_vgg19_plustop.h5"
+tuned_model_weights_file <- "model_tuned.h5"
 
 batch_size <- 10
-epochs <- 2
+train_epochs_top <- 20
+train_epochs_tune <- 20
 
 target_width <- 224
 target_height <- 224
@@ -20,6 +24,7 @@ test_data_dir = "data/test"
 
 # create the base pre-trained model
 base_model <- application_vgg19(weights = 'imagenet', include_top = FALSE)
+base_model %>% summary()
 
 # add our custom layers
 predictions <- base_model$output %>% 
@@ -31,12 +36,13 @@ predictions <- base_model$output %>%
 model <- keras_model(inputs = base_model$input, outputs = predictions)
 
 # first: train only the top layers (which were randomly initialized)
-# i.e. freeze all convolutional InceptionV3 layers
+# i.e. freeze all convolutional vgg19 layers
 for (layer in base_model$layers)
   layer$trainable <- FALSE
 
 # compile the model (should be done *after* setting layers to non-trainable)
-model %>% compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy')
+model %>% compile(optimizer = 'rmsprop', loss = 'binary_crossentropy',
+                  metrics = "accuracy")
 
 # train the model on the new data for a few epochs
 train_datagen <- image_data_generator(
@@ -46,7 +52,8 @@ train_datagen <- image_data_generator(
   #rotation_range = 20,
   #width_shift_range = 0.2,
   #height_shift_range = 0.2,
-  #horizontal_flip = TRUE
+  #horizontal_flip = TRUE,
+  #fill = "wrap"
 )
 
 test_datagen <- image_data_generator(
@@ -59,21 +66,28 @@ test_datagen <- image_data_generator(
   #horizontal_flip = TRUE
 )
 
-model %>% fit_generator(
-  generator = flow_images_from_directory(
-    train_data_dir,
-    generator = train_datagen,
-    target_size = c(target_height, target_width)),
-  # an epoch finishes when steps_per_epoch batches have been seen by the model
-  steps_per_epoch = as.integer(n_train/batch_size), 
-  epochs = epochs, 
-  validation_data = flow_images_from_directory(
-    test_data_dir,
-    generator = test_datagen,
-    target_size = c(target_height, target_width)),
-  validation_steps = as.integer(n_test/batch_size),
-  verbose = 1
-)
+if(model_exists == FALSE) {
+  model %>% fit_generator(
+    generator = flow_images_from_directory(
+      train_data_dir,
+      generator = train_datagen,
+      target_size = c(target_height, target_width)),
+    # an epoch finishes when steps_per_epoch batches have been seen by the model
+    steps_per_epoch = as.integer(n_train/batch_size), 
+    epochs = train_epochs_top, 
+    validation_data = flow_images_from_directory(
+      test_data_dir,
+      generator = test_datagen,
+      target_size = c(target_height, target_width)),
+    validation_steps = as.integer(n_test/batch_size),
+    verbose = 1
+  )
+  model %>% save_model_hdf5(model_name)
+} else {
+  model <- load_model_hdf5(model_name)
+}
+
+model %>% summary()
 
 # at this point, the top layers are well trained and we can start fine-tuning
 # convolutional layers from inception V3. We will freeze the bottom N layers
@@ -85,20 +99,85 @@ layers <- base_model$layers
 for (i in 1:length(layers))
   cat(i, layers[[i]]$name, "\n")
 
-# we chose to train the top 2 inception blocks, i.e. we will freeze
+# we chose to train the top 2 blocks, i.e. we will freeze
 # the first 172 layers and unfreeze the rest:
-for (i in 1:172)
+for (i in 1:17)
   layers[[i]]$trainable <- FALSE
-for (i in 173:length(layers))
+for (i in 18:length(layers))
   layers[[i]]$trainable <- TRUE
 
 # we need to recompile the model for these modifications to take effect
 # we use SGD with a low learning rate
 model %>% compile(
   optimizer = optimizer_sgd(lr = 0.0001, momentum = 0.9), 
-  loss = 'categorical_crossentropy'
+  loss = 'binary_crossentropy',
+  metrics = "accuracy"
 )
 
 # we train our model again (this time fine-tuning the top 2 inception blocks
 # alongside the top Dense layers
-model %>% fit_generator(...)
+model %>% fit_generator(
+  generator = flow_images_from_directory(
+    train_data_dir,
+    generator = train_datagen,
+    target_size = c(target_height, target_width)),
+  # an epoch finishes when steps_per_epoch batches have been seen by the model
+  steps_per_epoch = as.integer(n_train/batch_size), 
+  epochs = train_epochs_tune, 
+  validation_data = flow_images_from_directory(
+    test_data_dir,
+    generator = test_datagen,
+    target_size = c(target_height, target_width)),
+  validation_steps = as.integer(n_test/batch_size),
+  verbose = 1
+)
+
+model %>% save_model_weights_hdf5(tuned_model_weights_file)
+
+
+# Test ----------------------------------------------------------------
+
+img_path <- "data/train/crack/img_1_1_1345.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+preds
+
+
+score_img <- function(img_path, verbose = FALSE) {
+  img <- image_load(img_path, target_size = c(224,224)) %>% image_to_array()
+  img <- img/255
+  dim(img) <- c(1, dim(img))
+  preds <- model %>% predict(img)
+  pred_class <- which.max(preds)
+  prob <- preds[pred_class]
+  if (verbose) print(paste0("Image: ", img_path, "    Prediction: ", ifelse(pred_class==1, "crack", "no crack"),
+                            "    Confidence: ", round(prob,3)))
+  pred_class
+}
+
+score_img(img_path)  
+
+
+score_dir <- function(dir_path) {
+  images <- sapply(list.files(dir_path), function(file) file.path(dir_path, file))
+  sapply(images, score_img)
+}
+
+crack_scores <- score_dir(file.path(test_data_dir, "crack"))
+cracks_found <- sum(crack_scores == 1)
+
+no_crack_scores <- score_dir(file.path(test_data_dir, "nocrack"))
+no_cracks_found <- sum(no_crack_scores == 2)
+
+true_positives <- cracks_found
+false_negatives <-  n_test/2 - true_positives
+true_negatives <-  no_cracks_found
+false_positives <- n_test/2 - true_negatives
+
+(accuracy = (true_positives + true_negatives) / n_test)
+(sensitivity = true_positives / (true_positives + false_negatives))
+(precision = true_positives / (true_positives + false_positives))
+

@@ -1,0 +1,484 @@
+<style>
+.footer {
+    position: fixed; 
+    top: 90%;
+    text-align:right; 
+    width:100%;
+}
+
+.banner {
+    position: fixed; 
+    top: 0%;
+    text-align:right; 
+    width:100%;
+}
+
+.reveal section img {
+  border: 0px;
+  box-shadow: 0 0 0 0;
+}
+.reveal table td {
+  border: 0px;
+}
+
+.reveal table {
+  border: 0px;
+}
+
+.reveal h1 {
+  font-size: 1.6em;
+}
+
+.reveal figcaption {
+  font-size: 0.4em;
+}
+
+.small-code pre code {
+  font-size: .7em;
+}
+
+.reveal .smalltext {
+  font-size: 0.75em;
+}
+
+</style>
+
+
+Dive into Deep Learning
+========================================================
+author: Sigrid Keydana, Trivadis
+date: 2017/22/09
+autosize: true
+incremental:false
+width: 1440
+
+
+
+Deep Learning in action
+========================================================
+
+
+TBD
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+========================================================
+type:prompt
+
+&nbsp; 
+
+&nbsp; 
+
+<h1>Why Deep Learning?</h1>
+
+
+Easy? Difficult?
+========================================================
+incremental:true
+
+&nbsp;
+
+- walk
+- talk
+- play chess
+- solve matrix computations
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+So what is a neural network?
+========================================================
+
+&nbsp;
+
+Biological neuron and artificial neuron
+
+&nbsp;
+
+<figure>
+    <img src='neuron1.png' width='30%' align="left" style="margin-right: 10%;"/>
+    <img src='neuron2.png' width='30%' align="left" style="margin-right: 30%;"/>
+     <figcaption>Source: <a href='https://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html'>Stergiou, C. and Siganos, D. Artificial neurons</a>
+</figure>
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Prototype of a neuron: the Perceptron 
+========================================================
+
+<figure>
+  <img src='perceptron.png' width='800px' />
+<figcaption>Source: <a href='https://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html'>Stergiou, C. and Siganos, D. Artificial neurons</a>
+</figure>
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Deep neural networks: Introducing hidden layers
+========================================================
+
+<figure>
+  <img src='deep_nn.png' width='800px' />
+<figcaption>Source: <a href='https://www.doc.ic.ac.uk/~nd/surprise_96/journal/vol4/cs11/report.html'>Stergiou, C. and Siganos, D. Artificial neurons</a>
+</figure>
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Why go deep? A bit of background
+========================================================
+incremental:true
+
+&nbsp;
+
+Easy? Difficult?
+
+- walk
+- talk
+- play chess
+- solve matrix computations
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Easy for us - difficult for computers
+========================================================
+incremental:true
+
+&nbsp;
+
+- controlled movement 
+- speech recognition
+- speech generation
+- object recognition and object localization
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Representation matters
+========================================================
+
+<figure>
+    <img src='coords.png' width='60%'/>
+    <figcaption>Source: Goodfellow et al. 2016, <a href='http://www.deeplearningbook.org/'>Deep Learning</a></figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Just feed the network the right features?
+========================================================
+
+&nbsp;
+
+What are the correct pixel values for a "bike" feature?
+
+- race bike, mountain bike, e-bike?
+- pixels in the shadow may be much darker
+- what if bike is mostly obscured by rider standing in front?
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Let the network pick the features
+========================================================
+
+... a layer at a time
+
+<figure>
+    <img src='features.png' width='40%'/> 
+    <figcaption>Source: Goodfellow et al. 2016, <a href='http://www.deeplearningbook.org/'>Deep Learning</a></figcaption>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+OK but...
+========================================================
+incremental:true
+
+&nbsp;
+
+The DL  architectures en vogue now have mostly been around since the 1980s/1990s.
+
+So why the hype, ehm, success now?
+
+- big data
+- big models (due to better hardware, mostly)
+- big incentives (deep learning is profitable!)
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+========================================================
+type:prompt
+
+&nbsp; 
+
+&nbsp; 
+
+<h1>How does a deep network learn?</h1>
+
+
+
+
+
+Training a deep neural network
+========================================================
+
+&nbsp;
+
+We need:
+
+- a way to quantify our current (e.g., classification) error
+- a way to reduce error on subsequent iterations
+- a way to propagate our improvement logic from the output layer all the way back through the network!
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Quantifying error: Loss functions
+========================================================
+
+&nbsp;
+
+The _loss_ (or _cost_) function indicates the cost incurred from false prediction / misclassification.
+
+Probably the best-known loss functions in machine learning are __mean squared error__: 
+
+  $\frac{1}{n} \sum_n{(\hat{y} - y)^2}$
+  
+and __cross entropy__ :
+
+  $- \sum_j{t_j log(y_j)}$
+  
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Learning from errors: Gradient Descent
+========================================================
+
+
+<figure>
+    <img src='convex.png' width='40%'/>
+     <figcaption>Source: Goodfellow et al. 2016, <a href='http://www.deeplearningbook.org/'>Deep Learning</a>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Propagate back errors ... well: backpropagation!
+========================================================
+
+&nbsp;
+
+- basically, just the chain rule: $\frac{dz}{dx} = \frac{dz}{dy} \frac{dy}{dx}$
+- chained over several layers:
+
+<figure>
+    <img src='backprop2.png' width='40%'/>
+    <figcaption>Source: <a href=https://colah.github.io/posts/2015-08-Backprop/>https://colah.github.io/posts/2015-08-Backprop/</a></figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+ 
+
+
+========================================================
+type:prompt
+
+&nbsp; 
+
+&nbsp; 
+
+<h1>Example domain: Convolutional Neural Networks for Computer Vision</h1>
+
+
+Why computer vision is hard
+========================================================
+
+<figure>
+<img src='deformable_cat.png' width='800px' />
+<figcaption>Source: <a href='http://www.robots.ox.ac.uk/~vgg/publications/2012/parkhi12a/parkhi12a.pdf'>Parkhi et al. Cats and Dogs</a>
+</figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+
+Tasks in computer vision
+========================================================
+
+<figure>
+<img src='class_loc_dec_seg.png' width='1000px' />
+<figcaption>Source: <a href='http://cs231n.github.io/'>Stanford CS231n Convolutional Neural Networks Lecture Notes</a></figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Convolutional Neural Networks (CNNs)
+========================================================
+
+&nbsp;
+
+
+<figure>
+    <img src='convnet.jpeg' width='60%'/>
+    <figcaption>Source: <a href='http://cs231n.github.io/convolutional-networks/'>http://cs231n.github.io/convolutional-networks/</a></figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+The Convolution Operation
+========================================================
+
+&nbsp;
+
+<figure>
+    <img src='convolution_demo.png' width='40%'/>
+    <figcaption>Source: <a href='http://cs231n.github.io/convolutional-networks/'>http://cs231n.github.io/convolutional-networks/</a> (Live Demo on website!)</figcaption>
+</figure>
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+ 
+
+
+========================================================
+type:prompt
+
+&nbsp; 
+
+&nbsp; 
+
+<h1>End of theory - time for practice!</h1>
+
