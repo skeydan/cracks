@@ -2,12 +2,14 @@ library(keras)
 
 # Parameters --------------------------------------------------------------
 model_exists <- TRUE
-model_name <- "model_vgg19_plustop.h5"
-tuned_model_weights_file <- "model_tuned.h5"
+
+model_name <- "model_vgg16_plustop.h5"
+tuned_model_weights_file <- "model_vgg16_tuned.h5"
 
 batch_size <- 10
-train_epochs_top <- 20
-train_epochs_tune <- 20
+train_epochs_top <- 60
+train_epochs_tune <- 40
+resume_from_epoch <- 61
 
 target_width <- 224
 target_height <- 224
@@ -23,13 +25,16 @@ test_data_dir = "data/test"
 
 
 # create the base pre-trained model
-base_model <- application_vgg19(weights = 'imagenet', include_top = FALSE)
+base_model <- application_vgg16(weights = 'imagenet', include_top = FALSE)
+#base_model <- application_vgg19(weights = 'imagenet', include_top = FALSE)
+
 base_model %>% summary()
 
 # add our custom layers
 predictions <- base_model$output %>% 
   layer_global_average_pooling_2d() %>% 
   layer_dense(units = 128, activation = 'relu') %>% 
+  layer_dropout(0.5) %>%
   layer_dense(units = 2, activation = 'softmax')
 
 # this is the model we will train
@@ -47,23 +52,10 @@ model %>% compile(optimizer = 'rmsprop', loss = 'binary_crossentropy',
 # train the model on the new data for a few epochs
 train_datagen <- image_data_generator(
   rescale = 1/255
-  #featurewise_center = TRUE,
-  #featurewise_std_normalization = TRUE
-  #rotation_range = 20,
-  #width_shift_range = 0.2,
-  #height_shift_range = 0.2,
-  #horizontal_flip = TRUE,
-  #fill = "wrap"
 )
 
 test_datagen <- image_data_generator(
   rescale = 1/255
-  #featurewise_center = TRUE,
-  #featurewise_std_normalization = TRUE
-  #rotation_range = 20,
-  #width_shift_range = 0.2,
-  #height_shift_range = 0.2,
-  #horizontal_flip = TRUE
 )
 
 if(model_exists == FALSE) {
@@ -80,6 +72,7 @@ if(model_exists == FALSE) {
       generator = test_datagen,
       target_size = c(target_height, target_width)),
     validation_steps = as.integer(n_test/batch_size),
+    initial_epoch = resume_from_epoch,
     verbose = 1
   )
   model %>% save_model_hdf5(model_name)
@@ -100,11 +93,13 @@ for (i in 1:length(layers))
   cat(i, layers[[i]]$name, "\n")
 
 # we chose to train the top 2 blocks, i.e. we will freeze
-# the first 172 layers and unfreeze the rest:
-for (i in 1:17)
+# the first x layers and unfreeze the rest:
+for (i in 1:15)
   layers[[i]]$trainable <- FALSE
 for (i in 18:length(layers))
   layers[[i]]$trainable <- TRUE
+
+model %>% summary()
 
 # we need to recompile the model for these modifications to take effect
 # we use SGD with a low learning rate
@@ -113,6 +108,8 @@ model %>% compile(
   loss = 'binary_crossentropy',
   metrics = "accuracy"
 )
+
+#model %>% load_model_weights_hdf5(tuned_model_weights_file)
 
 # we train our model again (this time fine-tuning the top 2 inception blocks
 # alongside the top Dense layers

@@ -34,7 +34,7 @@
 }
 
 .small-code pre code {
-  font-size: .7em;
+  font-size: .85em;
 }
 
 .reveal .smalltext {
@@ -44,7 +44,7 @@
 </style>
 
 
-Dive into Deep Learning
+Automatic crack detection - with deep learning
 ========================================================
 author: Sigrid Keydana, Trivadis
 date: 2017/22/09
@@ -53,13 +53,35 @@ incremental:false
 width: 1440
 
 
-
-Deep Learning in action
+Crack? No crack?
 ========================================================
 
-
-TBD
-
+<table>
+<tr>
+<td><img src="data/test/crack/img_8_1121_1793.png"</td>
+<td><img src="data/test/crack/img_8_1345_1.png"</td>
+<td><img src="data/test/crack/img_10_1121_449.png"</td>
+<td><img src="data/test/crack/img_10_1121_673.png"</td>
+<td><img src="data/test/nocrack/img_8_1_225.png"</td>
+<td><img src="data/test/nocrack/img_8_1_1793.png"</td>
+</tr>
+<tr>
+<td><img src="data/test/crack/img_9_897_673.png"</td>
+<td><img src="data/test/crack/img_9_1121_449.png"</td>
+<td><img src="data/test/crack/img_9_1121_1793.png"</td>
+<td><img src="data/test/crack/img_10_1121_2241.png"</td>
+<td><img src="data/test/nocrack/img_9_225_449.png"</td>
+<td><img src="data/test/nocrack/img_11_449_897.png"</td>
+</tr>
+<tr>
+<td><img src="data/test/crack/img_8_1793_225.png"</td>
+<td><img src="data/test/crack/img_9_2017_673.png"</td>
+<td><img src="data/test/crack/img_11_1569_2689.png"</td>
+<td><img src="data/test/crack/img_8_449_1.png"</td>
+<td><img src="data/test/nocrack/img_11_1_1.png"</td>
+<td><img src="data/test/nocrack/img_11_897_2465.png"</td>
+</tr>
+</table>
 
 <div class="banner">
 <img src='tri_logo_high.jpg' border=0 width='200px'>
@@ -77,30 +99,11 @@ type:prompt
 
 &nbsp; 
 
-<h1>Why Deep Learning?</h1>
+<h1>One step back: What's deep learning?</h1>
 
 
-Easy? Difficult?
-========================================================
-incremental:true
 
-&nbsp;
-
-- walk
-- talk
-- play chess
-- solve matrix computations
-
-<div class="banner">
-<img src='tri_logo_high.jpg' border=0 width='200px'>
-</div>
-
-<div class="footer">
-<img src='cube3.png' border=0 width='122px'>
-</div>
-
-
-So what is a neural network?
+What is a neural network?
 ========================================================
 
 &nbsp;
@@ -126,7 +129,7 @@ Biological neuron and artificial neuron
 
 
 
-Prototype of a neuron: the Perceptron 
+Prototype of a neuron: the perceptron 
 ========================================================
 
 <figure>
@@ -145,7 +148,7 @@ Prototype of a neuron: the Perceptron
 
 
 
-Deep neural networks: Introducing hidden layers
+Going deep
 ========================================================
 
 <figure>
@@ -186,26 +189,6 @@ Easy? Difficult?
 </div>
 
 
-
-Easy for us - difficult for computers
-========================================================
-incremental:true
-
-&nbsp;
-
-- controlled movement 
-- speech recognition
-- speech generation
-- object recognition and object localization
-
-
-<div class="banner">
-<img src='tri_logo_high.jpg' border=0 width='200px'>
-</div>
-
-<div class="footer">
-<img src='cube3.png' border=0 width='122px'>
-</div>
 
 
 Representation matters
@@ -264,28 +247,6 @@ Let the network pick the features
 <img src='cube3.png' border=0 width='122px'>
 </div>
 
-
-OK but...
-========================================================
-incremental:true
-
-&nbsp;
-
-The DL  architectures en vogue now have mostly been around since the 1980s/1990s.
-
-So why the hype, ehm, success now?
-
-- big data
-- big models (due to better hardware, mostly)
-- big incentives (deep learning is profitable!)
-
-<div class="banner">
-<img src='tri_logo_high.jpg' border=0 width='200px'>
-</div>
-
-<div class="footer">
-<img src='cube3.png' border=0 width='122px'>
-</div>
 
 
 ========================================================
@@ -480,5 +441,233 @@ type:prompt
 
 &nbsp; 
 
-<h1>End of theory - time for practice!</h1>
+<h1>Back to our cracks!</h1>
+
+
+
+========================================================
+
+&nbsp;
+
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+ 
+Let's build our own CNN, in Keras
+========================================================
+
+&nbsp;
+
+4 steps
+- build model
+- prepare data
+- train model
+- test model
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Build model
+========================================================
+class:small-code
+
+&nbsp;
+
+```{r, echo=FALSE}
+library(keras)
+target_width <- 224
+target_height <- 224
+```
+
+
+```{r}
+model <- keras_model_sequential()
+
+model %>%
+  layer_conv_2d(
+    filter = 32, kernel_size = c(3,3), padding = "same", input_shape = c(target_height, target_width, 3) ) %>%
+  layer_activation("relu") %>%
+  layer_max_pooling_2d(pool_size = c(2,2)) %>%
+  
+  layer_conv_2d(filter = 32, kernel_size = c(3,3)) %>%
+  layer_activation("relu") %>%
+  layer_max_pooling_2d(pool_size = c(2,2)) %>%
+  
+  layer_conv_2d(filter = 64, kernel_size = c(3,3), padding = "same") %>%
+  layer_activation("relu") %>%
+  layer_max_pooling_2d(pool_size = c(2,2)) %>%
+  
+  layer_flatten() %>%
+  layer_dense(64) %>%
+  layer_activation("relu") %>%
+  layer_dropout(0.5) %>%
+  layer_dense(2) %>%
+  layer_activation("softmax")
+
+opt <- optimizer_rmsprop(lr = 0.001, decay = 1e-6)
+
+model %>% compile(
+  loss = "binary_crossentropy",
+  optimizer = opt,
+  metrics = "accuracy"
+)
+
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+How about the data?
+========================================================
+incremental:true
+
+&nbsp;
+
+- in this case study, we have very little data at our disposition
+- can use data augmentation to artificially increase training set size
+
+&nbsp;
+
+```{r}
+train_datagen <- image_data_generator(
+    rescale = 1/255,
+    rotation_range = 80,
+    width_shift_range = 0.2,
+    height_shift_range = 0.2,
+    horizontal_flip = TRUE,
+    vertical_flip = TRUE,
+    shear_range = 0.2,
+    zoom_range = 0.2,
+    fill_mode = "wrap"
+  )
+```
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+Train model
+========================================================
+incremental:true
+
+&nbsp;
+
+- Ready to resume in a few hours?
+- Let's load the trained model instead
+
+```{r}
+model_name <- "model_filter323264_kernel3_epochs20_lr001.h5"
+model <- load_model_hdf5(model_name)
+```
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Test model
+========================================================
+
+&nbsp;
+
+- Accuracy (on test set): 0.86
+- Recall (on test set): 0.88
+- Precision (on test set): 0.85
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Let's look at some predictions!
+========================================================
+
+&nbsp;
+
+```{r, echo=FALSE}
+library(EBImage)
+img <- readImage("data/train/crack/img_1_1_1345.png")
+display(img)
+```
+
+```{r, echo=FALSE}
+img_path <- "data/train/crack/img_1_1_1345.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+print("class probabilities(crack/no crack): "preds
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Test model
+========================================================
+
+&nbsp;
+
+```{r}
+library(EBImage)
+img <- readImage("data/train/crack/img_1_1_1345.png")
+display(img)
+```
+
+```{r}
+img_path <- "data/train/crack/img_1_1_1345.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+preds
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
 
