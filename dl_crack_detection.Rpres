@@ -50,7 +50,7 @@ author: Sigrid Keydana, Trivadis
 date: 2017/22/09
 autosize: true
 incremental:false
-width: 1440
+width: 1200
 
 
 Crack? No crack?
@@ -324,7 +324,7 @@ Learning from errors: Gradient Descent
 </div>
 
 
-Propagate back errors ... well: backpropagation!
+Propagate back errors ... backpropagation!
 ========================================================
 
 &nbsp;
@@ -445,21 +445,7 @@ type:prompt
 
 
 
-========================================================
-
-&nbsp;
-
-
-
-<div class="banner">
-<img src='tri_logo_high.jpg' border=0 width='200px'>
-</div>
-
-<div class="footer">
-<img src='cube3.png' border=0 width='122px'>
-</div>
- 
-Let's build our own CNN, in Keras
+Let's build our own CNN, in Keras (using R!)
 ========================================================
 
 &nbsp;
@@ -537,7 +523,8 @@ model %>% compile(
 
 How about the data?
 ========================================================
-incremental:true
+class:small-code
+
 
 &nbsp;
 
@@ -571,12 +558,16 @@ train_datagen <- image_data_generator(
 
 Train model
 ========================================================
+class:small-code
 incremental:true
 
 &nbsp;
 
 - Ready to resume in a few hours?
 - Let's load the trained model instead
+
+&nbsp;
+
 
 ```{r}
 model_name <- "model_filter323264_kernel3_epochs20_lr001.h5"
@@ -595,12 +586,13 @@ model <- load_model_hdf5(model_name)
 
 Test model
 ========================================================
+incremental:true
 
 &nbsp;
 
-- Accuracy (on test set): 0.86
-- Recall (on test set): 0.88
-- Precision (on test set): 0.85
+- Accuracy (train/test):  0.70  / 0.86
+- Recall (train/test):    0.50  / 0.88
+- Precision (train/test): 0.870 / 0.85
 
 <div class="banner">
 <img src='tri_logo_high.jpg' border=0 width='200px'>
@@ -611,16 +603,16 @@ Test model
 </div>
 
 
-Let's look at some predictions!
+Let's look at some predictions (1)
 ========================================================
+class:small-code
+incremental:true
+
+Crack (top row - _easy_)
+
+<figure><img src="data/train/crack/img_1_1_1345.png" /></figure>
 
 &nbsp;
-
-```{r, echo=FALSE}
-library(EBImage)
-img <- readImage("data/train/crack/img_1_1_1345.png")
-display(img)
-```
 
 ```{r, echo=FALSE}
 img_path <- "data/train/crack/img_1_1_1345.png"
@@ -629,38 +621,193 @@ x <- image_to_array(img)
 x <- x/255
 dim(x) <- c(1, dim(x))
 preds <- model %>% predict(x)
-print("class probabilities(crack/no crack): "preds
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
 ```
 
 <div class="banner">
 <img src='tri_logo_high.jpg' border=0 width='200px'>
 </div>
 
+
 <div class="footer">
 <img src='cube3.png' border=0 width='122px'>
 </div>
 
 
-Test model
+Let's look at some predictions (2)
 ========================================================
+class:small-code
+incremental:true
+
+No crack (top row - _easy_)
+
+<figure><img src="data/test/nocrack/img_8_1_225.png" /></figure>
 
 &nbsp;
 
-```{r}
-library(EBImage)
-img <- readImage("data/train/crack/img_1_1_1345.png")
-display(img)
-```
-
-```{r}
-img_path <- "data/train/crack/img_1_1_1345.png"
+```{r, echo=FALSE}
+img_path <- "data/test/nocrack/img_8_1_225.png"
 img <- image_load(img_path, target_size = c(224,224))
 x <- image_to_array(img)
 x <- x/255
 dim(x) <- c(1, dim(x))
 preds <- model %>% predict(x)
-preds
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
 ```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Let's look at some predictions (3)
+========================================================
+class:small-code
+incremental:true
+
+Crack (middle row - _medium_)
+
+<figure><img src="data/test/crack/img_9_1121_1793.png" /></figure>
+
+&nbsp;
+
+```{r, echo=FALSE}
+img_path <- "data/test/crack/img_9_1121_1793.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Let's look at some predictions (4)
+========================================================
+class:small-code
+incremental:true
+
+No crack (middle row - _medium_)
+
+<figure><img src="data/test/nocrack/img_9_225_449.png" /></figure>
+
+&nbsp;
+
+```{r, echo=FALSE}
+img_path <- "data/test/nocrack/img_9_225_449.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+Let's look at some predictions (5)
+========================================================
+class:small-code
+incremental:true
+
+Crack (bottom row - _difficult_)
+
+<figure><img src="data/test/crack/img_9_2017_673.png" /></figure>
+
+&nbsp;
+
+```{r, echo=FALSE}
+img_path <- "data/test/crack/img_9_2017_673.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
+```
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Let's look at some predictions (6)
+========================================================
+class:small-code
+incremental:true
+
+No crack (bottom row - _difficult_)
+
+<figure><img src="data/test/nocrack/img_11_897_2465.png" /></figure>
+
+&nbsp;
+
+```{r, echo=FALSE}
+img_path <- "data/test/nocrack/img_11_897_2465.png"
+img <- image_load(img_path, target_size = c(224,224))
+x <- image_to_array(img)
+x <- x/255
+dim(x) <- c(1, dim(x))
+preds <- model %>% predict(x)
+cat(paste0("class probabilities(crack/no crack): ", paste0(round(preds[[1]], 2), " / ", round(preds[[2]], 2))))
+```
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+How about using a pre-trained model?
+========================================================
+class:small-code
+
+&nbsp;
+
+- frameworks often already come with models pre-trained on ImageNet (such ResNet, VGG16, InceptionV3...)
+- usual workflow
+    - instantiate all layers below top-level densely connected layer, and set them to non-trainable
+    - put own densely connected layer on top and train the unified model
+    - possibly unfreeze a few of the convolutional blocks near the top and try fine-tuning them
+    
+```{r}
+base_model <- application_vgg16(weights = 'imagenet', include_top = FALSE)
+for (layer in base_model$layers)
+  layer$trainable <- FALSE
+# add our own fully connected layer (with dropout!)
+```
+
 
 <div class="banner">
 <img src='tri_logo_high.jpg' border=0 width='200px'>
@@ -671,3 +818,100 @@ preds
 </div>
 
 
+
+Pre-trained model: accuracy
+========================================================
+class:small-code
+
+&nbsp;
+
+- Accuracy (train/test):  1.0 / 0.83
+- Recall (train/test):    1.0 / 0.88
+- Precision (train/test): 1.0 / 0.8
+
+... this means?
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+We need more data!
+========================================================
+
+&nbsp;
+
+- for this example, only 7 actual images were used to train the model
+- in the real world, for a task like this, we expect _much_ more data to be available
+- already with this tiny amount of data and a small network trained from scratch, performance is pretty good!
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Conclusion
+========================================================
+incremental:true
+
+&nbsp;
+
+- just one of many possible things you can do with deep learning
+- more and more "traditional" machine learning problems are being addressed with DL all the time, with increasing success
+- watch out for increased application to _unsupervised_ problems! 
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+Finally
+========================================================
+incremental:true
+
+
+&nbsp;
+
+- neural networks are less of a black box than one might think
+- open source frameworks like Keras, PyTorch or TensorFlow make it easy to try DL for yourself
+- how could deep learning apply to _your_ problem domain?
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>
+
+
+========================================================
+
+
+&nbsp;
+
+THANK YOU!
+
+
+<div class="banner">
+<img src='tri_logo_high.jpg' border=0 width='200px'>
+</div>
+
+<div class="footer">
+<img src='cube3.png' border=0 width='122px'>
+</div>

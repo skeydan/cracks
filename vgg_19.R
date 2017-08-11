@@ -2,6 +2,7 @@ library(keras)
 
 # Parameters --------------------------------------------------------------
 model_exists <- TRUE
+tuned_weights_exist <- TRUE
 
 model_name <- "model_vgg16_plustop.h5"
 tuned_model_weights_file <- "model_vgg16_tuned.h5"
@@ -109,28 +110,26 @@ model %>% compile(
   metrics = "accuracy"
 )
 
-#model %>% load_model_weights_hdf5(tuned_model_weights_file)
-
-# we train our model again (this time fine-tuning the top 2 inception blocks
-# alongside the top Dense layers
-model %>% fit_generator(
-  generator = flow_images_from_directory(
-    train_data_dir,
-    generator = train_datagen,
-    target_size = c(target_height, target_width)),
-  # an epoch finishes when steps_per_epoch batches have been seen by the model
-  steps_per_epoch = as.integer(n_train/batch_size), 
-  epochs = train_epochs_tune, 
-  validation_data = flow_images_from_directory(
-    test_data_dir,
-    generator = test_datagen,
-    target_size = c(target_height, target_width)),
-  validation_steps = as.integer(n_test/batch_size),
-  verbose = 1
-)
-
-model %>% save_model_weights_hdf5(tuned_model_weights_file)
-
+if(tuned_weights_exist == FALSE) {
+  model %>% fit_generator(
+    generator = flow_images_from_directory(
+      train_data_dir,
+      generator = train_datagen,
+      target_size = c(target_height, target_width)),
+    # an epoch finishes when steps_per_epoch batches have been seen by the model
+    steps_per_epoch = as.integer(n_train/batch_size), 
+    epochs = train_epochs_tune, 
+    validation_data = flow_images_from_directory(
+      test_data_dir,
+      generator = test_datagen,
+      target_size = c(target_height, target_width)),
+    validation_steps = as.integer(n_test/batch_size),
+    verbose = 1
+  )
+  model %>% save_model_weights_hdf5(tuned_model_weights_file)
+} else {
+  model %>% load_model_weights_hdf5(tuned_model_weights_file)
+}
 
 # Test ----------------------------------------------------------------
 
@@ -177,4 +176,22 @@ false_positives <- n_test/2 - true_negatives
 (accuracy = (true_positives + true_negatives) / n_test)
 (sensitivity = true_positives / (true_positives + false_negatives))
 (precision = true_positives / (true_positives + false_positives))
+
+###
+
+crack_scores <- score_dir(file.path(train_data_dir, "crack"))
+cracks_found <- sum(crack_scores == 1)
+
+no_crack_scores <- score_dir(file.path(train_data_dir, "nocrack"))
+no_cracks_found <- sum(no_crack_scores == 2)
+
+true_positives <- cracks_found
+false_negatives <-  n_train/2 - true_positives
+true_negatives <-  no_cracks_found
+false_positives <- n_train/2 - true_negatives
+
+(accuracy = (true_positives + true_negatives) / n_train)
+(sensitivity = true_positives / (true_positives + false_negatives))
+(precision = true_positives / (true_positives + false_positives))
+
 

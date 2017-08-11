@@ -173,5 +173,20 @@ false_positives <- n_test/2 - true_negatives
 (precision = true_positives / (true_positives + false_positives))
 
 
+###
 
+crack_scores <- score_dir(file.path(train_data_dir, "crack"))
+cracks_found <- sum(crack_scores == 1)
+
+no_crack_scores <- score_dir(file.path(train_data_dir, "nocrack"))
+no_cracks_found <- sum(no_crack_scores == 2)
+
+true_positives <- cracks_found
+false_negatives <-  n_train/2 - true_positives
+true_negatives <-  no_cracks_found
+false_positives <- n_train/2 - true_negatives
+
+(accuracy = (true_positives + true_negatives) / n_train)
+(sensitivity = true_positives / (true_positives + false_negatives))
+(precision = true_positives / (true_positives + false_positives))
 
